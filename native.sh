@@ -1,3 +1,4 @@
+# native.sh
 # sudo 패스워드 묻지 않음
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER
 
