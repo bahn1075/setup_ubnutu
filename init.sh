@@ -36,7 +36,7 @@ if ! grep -q "zsh-syntax-highlighting" ~/.zshrc; then
 fi
 source ~/.zshrc
 # starship 설정
-brew install starship fastfetch
+brew install starship fastfetch k9s
 
 # starship 설정 추가
 curl -o ~/.config/starship.toml https://raw.githubusercontent.com/bahn1075/el_init/ubuntu/starship.toml
@@ -111,8 +111,7 @@ minikube version
 # minikube start
 minikube config set cpus 8
 minikube config set memory 28672
-minikube start --addons=metrics-server,ingress,ingress-dns,logviewer --feature-gates='ImageVolume=true'
-minikube tunnel
+minikube start --addons=metrics-server,ingress,ingress-dns,logviewer,metallb
 
 #web logviewer 접속
 http://192.168.49.2:32000/
@@ -122,9 +121,6 @@ kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/maste
 
 # kubectx, kubens 설치
 curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_kubens.sh | bash
-
-# k9s 설치
-brew install k9s
 
 
 #######################################################################################################
