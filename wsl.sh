@@ -102,8 +102,5 @@ minikube config set cpus 4
 minikube config set memory 28672
 minikube start --addons=metrics-server,ingress,ingress-dns,logviewer,metallb
 
-#기동후 amd gpu plugin 수동 설치
-kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
-
 # kubectx, kubens 설치
 curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_kubens.sh | bash
