@@ -1,3 +1,4 @@
+#wsl용 init 파일
 # sudo 패스워드 묻지 않음
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER
 
@@ -48,18 +49,6 @@ echo 'fastfetch' >> /home/$USER/.zshrc
 
 source ~/.zshrc
 
-#amd gpu rocm installation
-wget https://repo.radeon.com/amdgpu-install/7.0.2/ubuntu/noble/amdgpu-install_7.0.2.70002-1_all.deb
-sudo apt install ./amdgpu-install_7.0.2.70002-1_all.deb
-sudo apt update
-sudo apt install python3-setuptools python3-wheel
-sudo usermod -a -G render,video $LOGNAME # Add the current user to the render and video groups
-sudo apt install rocm
-
-# (위에 이어서) amd gpu driver install
-sudo apt install "linux-headers-$(uname -r)" "linux-modules-extra-$(uname -r)"
-sudo apt install amdgpu-dkms
-
 # npm 설치
 sudo apt install npm -y
 
@@ -109,91 +98,12 @@ sudo dpkg -i minikube_latest_amd64.deb
 minikube version
 
 # minikube start
-minikube config set cpus 8
+minikube config set cpus 4
 minikube config set memory 28672
 minikube start --addons=metrics-server,ingress,ingress-dns,logviewer,metallb
-
-#web logviewer 접속
-http://192.168.49.2:32000/
 
 #기동후 amd gpu plugin 수동 설치
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
 
 # kubectx, kubens 설치
 curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_kubens.sh | bash
-
-
-#######################################################################################################
-- Linux Client 링크
-
-https://kcloud.lgcns.com/vmCubeClients/Tilon/linux/Linker-Linux-v8.0.0.2.deb
-
-
-- 설치 가이드 (현재 설치 방법 간소화 작업 진행 중)
-
-<설치>
-일단 홈페이지에서 다운로드 받는 9버전은 mime.sh가 없어서 작동하지 않음
-위에 있는 8버전을 주소창에서 직접 다운로드 받고 아래 절차대로 설치
-
-
-0. 의존성 사전설치
-sudo apt update
-sudo apt install libqt5websockets5 libqt5websockets5-dev
-
-# 또는 더 포괄적으로 Qt5 관련 패키지 설치
-sudo apt install qtbase5-dev qt5-qmake libqt5websockets5
-
-1. 다운로드 디렉토리에서 패키지 설치
-
-    - sudo dpkg -i Linker-Linux~~.deb(linker client 파일)
-
-2. 서비스 등록
-
-    - sudo /usr/local/TILON/DstationClient/install.sh
-
-    - /usr/local/TILON/DstationClient/setmime.sh
-    => zsh: 그런 파일이나 디렉터리가 없습니다: /usr/local/TILON/DstationClient/setmime.sh
-    => 해결책
-       8버전 설치 후 파일 내용 확인 하면 아래와 같음
-       cat /usr/local/TILON/DstationClient/setmime.sh
-        mkdir -p $HOME/.local/share/mime/packages
-        cp /usr/local/TILON/DstationClient/dslinker9.xml $HOME/.local/share/mime/packages/dslinker9.xml
-        cp /usr/local/TILON/DstationClient/dslinker9.desktop $HOME/.local/share/applications
-
-        xdg-mime default dslinker9.desktop x-scheme-handler/dslinker9
-        update-mime-database ~/.local/share/mime
-        xdg-mime query default x-scheme-handler/dslinker9
-        update-mime-database ~/.local/share/mime
-
-# MIME 타입 핸들러 확인
-CURRENT_DEFAULT=$(xdg-mime query default x-scheme-handler/dslinker9)
-
-# 결과 출력
-echo "현재 x-scheme-handler/dslinker MIME 타입 핸들러: $CURRENT_DEFAULT"
-
-
-3. 서비스 상태 확인
-
-    - sudo systemctl status Tservice
-
-
-1. Firefox 실행
-
-2. 주소창에 about:config 입력
-
-3. 경고 수락
-
-4. network.protocol-handler.expose.dslinker9 을 true로 추가
-
-5. 터미널에서 "update-desktop-database ~/.local/share/applications" 명령어로 MIME DB 갱신
-
-6. Firefox 종료
-
-7. 접속 재시도
-
-
-<설치 후 라이브러리 이슈로 미동작 시 조치 방법>
-
-1. 라이브러리 설치
-
-- sudo apt install libasound2-dev libpulse-dev zlib1g-dev libssl-dev clang-format libkrb5-dev libsystemd-dev libcjson-dev libavcodec-dev libavutil-dev libswresample-dev liburiparser-dev libjson-c-dev libicu-dev libcups2-dev libfuse3-dev libsdl2-dev libcurl4-openssl-dev libsdl2-ttf-dev libusb-1.0-0-dev libswscale-dev libavformat-dev libavutil-dev libavdevice-dev nlohmann-json3-dev
