@@ -141,7 +141,6 @@ minikube version
 minikube config set cpus 8
 minikube config set memory 28672
 minikube start --addons=metrics-server,metallb --cni=flannel
-minikube tunnel
 
 #기동후 amd gpu plugin 수동 설치
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
