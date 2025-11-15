@@ -6,7 +6,7 @@ echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER
 sudo apt update && sudo apt upgrade -y
 
 # install essentials
-sudo apt install zip timeshift wget btop zsh curl net-tools fonts-cascadia-code jq vim -y
+sudo apt install zip timeshift grub-customizer wget btop zsh curl net-tools fonts-cascadia-code jq vim -y
 
 # Meslo nerd font
 curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Meslo.zip -o /tmp/meslo.zip && unzip /tmp/meslo.zip -d /tmp/meslo && sudo mkdir -p /usr/share/fonts/truetype/meslo-nerd && sudo cp /tmp/meslo/*.ttf /usr/share/fonts/truetype/meslo-nerd/ && sudo fc-cache -fv && rm -rf /tmp/meslo*
@@ -37,7 +37,35 @@ if ! grep -q "zsh-syntax-highlighting" ~/.zshrc; then
 fi
 source ~/.zshrc
 # starship 설정
-brew install starship fastfetch
+brew install starship fastfetch k9s
+brew install --cask ghostty
+
+###################ghostty 설정#########################
+# Append Ghostty configuration to ~/.config/ghostty in an idempotent way
+GHOSTTY_CONFIG_DIR="$HOME/.config"
+GHOSTTY_CONFIG_FILE="$GHOSTTY_CONFIG_DIR/ghostty"
+
+# Ensure config directory exists
+mkdir -p "$GHOSTTY_CONFIG_DIR"
+
+# Only append the block once to avoid duplicates
+if ! grep -q "# BEGIN el_init ghostty config" "$GHOSTTY_CONFIG_FILE" 2>/dev/null; then
+  cat >> "$GHOSTTY_CONFIG_FILE" <<'GHOSTTY_CONF'
+# BEGIN el_init ghostty config
+# Nord Theme
+theme = Nord
+
+# Clipboard
+# 선택한 텍스트를 clipboard로 자동 복사
+copy-on-select = clipboard
+right-click-action = paste
+# END el_init ghostty config
+GHOSTTY_CONF
+  echo "Appended ghostty config to $GHOSTTY_CONFIG_FILE"
+else
+  echo "ghostty config already present in $GHOSTTY_CONFIG_FILE (skipping append)"
+fi
+###################ghostty 설정#########################
 
 # starship 설정 추가
 curl -o ~/.config/starship.toml https://raw.githubusercontent.com/bahn1075/el_init/ubuntu/starship.toml
@@ -50,12 +78,12 @@ echo 'fastfetch' >> /home/$USER/.zshrc
 source ~/.zshrc
 
 #amd gpu rocm installation
-wget https://repo.radeon.com/amdgpu-install/7.0.2/ubuntu/noble/amdgpu-install_7.0.2.70002-1_all.deb
-sudo apt install ./amdgpu-install_7.0.2.70002-1_all.deb
 sudo apt update
-sudo apt install python3-setuptools python3-wheel
-sudo usermod -a -G render,video $LOGNAME # Add the current user to the render and video groups
-sudo apt install rocm
+cd /tmp
+wget https://repo.radeon.com/amdgpu-install/7.1/ubuntu/noble/amdgpu-install_7.1.70100-1_all.deb
+sudo apt install ./amdgpu-install_7.1.70100-1_all.deb
+sudo amdgpu-install -y --usecase=graphics,rocm
+sudo usermod -a -G render,video $LOGNAME
 
 # (위에 이어서) amd gpu driver install
 sudo apt install "linux-headers-$(uname -r)" "linux-modules-extra-$(uname -r)"
@@ -112,11 +140,8 @@ minikube version
 # minikube start
 minikube config set cpus 8
 minikube config set memory 28672
-minikube start --addons=metrics-server,ingress,ingress-dns,logviewer --feature-gates='ImageVolume=true'
+minikube start --addons=metrics-server,metallb --cni=flannel
 minikube tunnel
-
-#web logviewer 접속
-http://192.168.49.2:32000/
 
 #기동후 amd gpu plugin 수동 설치
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
@@ -124,9 +149,14 @@ kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/maste
 # kubectx, kubens 설치
 curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_kubens.sh | bash
 
-# k9s 설치
-brew install k9s
+# freelens 설치
+sudo snap install freelens --classic
 
+# vscode 설치
+sudo snap install --classic code
+
+# termius-beta 설치
+sudo snap install termius-beta
 
 #######################################################################################################
 - Linux Client 링크
