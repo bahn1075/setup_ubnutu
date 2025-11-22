@@ -138,9 +138,12 @@ sudo dpkg -i minikube_latest_amd64.deb
 minikube version
 
 # minikube start
-minikube config set cpus 8
-minikube config set memory 28672
-minikube start --addons=metrics-server,metallb --cni=flannel
+minikube config set cpus 4
+minikube config set memory 8192
+minikube start --nodes 2 --cni=flannel
+minikube addons enable metrics-server
+minikube addons enable metallb
+
 
 #기동후 amd gpu plugin 수동 설치
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
