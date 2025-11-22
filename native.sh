@@ -143,6 +143,7 @@ minikube config set memory 8192
 minikube start --nodes 2 --cni=flannel
 minikube addons enable metrics-server
 minikube addons enable metallb
+minikube tunnel # metallb ip할당을 위해 별도 터미널에서 기동 필요
 
 
 #기동후 amd gpu plugin 수동 설치
