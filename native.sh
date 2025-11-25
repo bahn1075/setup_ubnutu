@@ -143,7 +143,28 @@ minikube config set memory 8192
 minikube start --nodes 2 --cni=flannel
 minikube addons enable metrics-server
 minikube addons enable metallb
-minikube tunnel # metallb ip할당을 위해 별도 터미널에서 기동 필요
+
+# minikube 자동화 서비스 설치 (tunnel + inotify)
+echo ""
+echo "=========================================="
+echo "Minikube 자동화 서비스 설치 중..."
+echo "=========================================="
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/bahn1075/mykubernetes/main/monitoring/install-minikube-services.sh)" || {
+    echo "⚠️  자동화 서비스 설치 실패. 수동으로 설정합니다..."
+    
+    # 수동 inotify 설정
+    echo "Minikube 노드 inotify 설정 중..."
+    for node in $(minikube node list | awk '{print $1}'); do
+      echo "  - $node 설정 중..."
+      minikube ssh -n $node -- 'sudo sysctl -w fs.inotify.max_user_instances=1024' > /dev/null
+      minikube ssh -n $node -- 'sudo sysctl -w fs.inotify.max_user_watches=524288' > /dev/null
+    done
+    echo "✓ inotify 설정 완료"
+    echo ""
+    echo "⚠️  minikube tunnel은 별도 터미널에서 수동으로 실행하세요:"
+    echo "   minikube tunnel"
+}
+echo ""
 
 
 #기동후 amd gpu plugin 수동 설치
