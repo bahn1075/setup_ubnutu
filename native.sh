@@ -37,7 +37,7 @@ if ! grep -q "zsh-syntax-highlighting" ~/.zshrc; then
 fi
 source ~/.zshrc
 # starship 설정
-brew install starship fastfetch k9s
+brew install starship fastfetch k9s eza
 brew install --cask ghostty
 
 ###################ghostty 설정#########################
@@ -74,6 +74,11 @@ echo 'eval "$(starship init zsh)"' >> /home/$USER/.zshrc
 
 # fastfetch 설정 추가
 echo 'fastfetch' >> /home/$USER/.zshrc
+
+#eza 설정 추가
+#echo "alias ls='eza -T --icons --level=2 --git'" >> /home/$USER/.zshrc
+echo "alias ls='eza --icons --git --level=2'" >> /home/$USER/.zshrc
+
 
 source ~/.zshrc
 
