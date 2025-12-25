@@ -2,20 +2,59 @@
 # sudo 패스워드 묻지 않음
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER
 
-#필수설치
+# 필수설치
+```
 sudo apt update && sudo apt upgrade -y
+```
 
 # install essentials
-sudo apt install zip timeshift wget btop zsh curl net-tools fonts-cascadia-code jq vim -y
+sudo apt install zip gh timeshift wget btop zsh curl net-tools fonts-cascadia-code jq vim -y
+
+
+# lunarlake npu driver
+https://github.com/intel/linux-npu-driver/releases
+
+# github 로그인
+gh auth login
+
+git config --global user.name "cozy"
+git config --global user.email bahn1075@gmail.com
+
+# edge browser install
+https://www.microsoft.com/en-us/edge/business/download?form=MA13FJ
+여기서 다운로드 받고 다운로드 받은 파일에 우클릭해서 app center(=snap)으로 설치한다.
+
+# ghostty 설치
+snap install ghostty --classic
+
+
+###################ghostty 설정#########################
+ghostty에서 config 설정을 열고 메모장으로 config 파일이 열리면 아래 내용을 붙여넣는다
+
+# BEGIN el_init ghostty config
+# Nord Theme
+theme = Nord
+
+# Clipboard
+# 선택한 텍스트를 clipboard로 자동 복사
+copy-on-select = clipboard
+right-click-action = paste
+# END el_init ghostty config
+###################ghostty 설정#########################
+
+# vs code 설치 
+sudo snap install code --classic
+
+# 
 
 # Meslo nerd font
 curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Meslo.zip -o /tmp/meslo.zip && unzip /tmp/meslo.zip -d /tmp/meslo && sudo mkdir -p /usr/share/fonts/truetype/meslo-nerd && sudo cp /tmp/meslo/*.ttf /usr/share/fonts/truetype/meslo-nerd/ && sudo fc-cache -fv && rm -rf /tmp/meslo*
 
-#ohmyzsh
+# ohmyzsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-#brew 설치
+# brew 설치
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-#brew 설정
+# brew 설정
 echo >> /home/$USER/.zshrc
 echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/$USER/.zshrc
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -28,46 +67,21 @@ git clone https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-~/.
 # .zshrc에 플러그인 추가 (이미 있으면 중복 추가 방지)
 if ! grep -q "zsh-syntax-highlighting" ~/.zshrc; then
   sed -i 's/^plugins=(\(.*\))/plugins=(\1 zsh-syntax-highlighting)/' ~/.zshrc
-  # 만약 plugins= 라인이 없다면 추가
+  #만약 plugins= 라인이 없다면 추가
   if ! grep -q "^plugins=" ~/.zshrc; then
     echo "plugins=(git kubectl kube-ps1 zsh-syntax-highlighting zsh-autosuggestions)" >> ~/.zshrc
   fi
-  # 플러그인 활성화 코드가 없으면 추가
+  #플러그인 활성화 코드가 없으면 추가
   echo "source \${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
 fi
 source ~/.zshrc
-# starship 설정
-brew install starship fastfetch k9s
 
-# ghostty 설치
-snap install ghostty --classic
+# brew 설치 대상
+brew install starship fastfetch k9s eza
 
-###################ghostty 설정#########################
-# Append Ghostty configuration to ~/.config/ghostty in an idempotent way
-GHOSTTY_CONFIG_DIR="$HOME/.config"
-GHOSTTY_CONFIG_FILE="$GHOSTTY_CONFIG_DIR/ghostty"
+# superfile 설치 (실행 spf)
+bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
 
-# Ensure config directory exists
-mkdir -p "$GHOSTTY_CONFIG_DIR"
-
-# Only append the block once to avoid duplicates
-if ! grep -q "# BEGIN el_init ghostty config" "$GHOSTTY_CONFIG_FILE" 2>/dev/null; then
-  cat >> "$GHOSTTY_CONFIG_FILE" <<'GHOSTTY_CONF'
-# BEGIN el_init ghostty config
-# Nord Theme
-theme = Nord
-
-# Clipboard
-# 선택한 텍스트를 clipboard로 자동 복사
-copy-on-select = clipboard
-right-click-action = paste
-# END el_init ghostty config
-GHOSTTY_CONF
-  echo "Appended ghostty config to $GHOSTTY_CONFIG_FILE"
-else
-  echo "ghostty config already present in $GHOSTTY_CONFIG_FILE (skipping append)"
-fi
-###################ghostty 설정#########################
 
 # starship 설정 추가
 curl -o ~/.config/starship.toml https://raw.githubusercontent.com/bahn1075/el_init/ubuntu/starship.toml
@@ -79,27 +93,15 @@ echo 'fastfetch' >> /home/$USER/.zshrc
 
 source ~/.zshrc
 
-#amd gpu rocm installation
-sudo apt update
-cd /tmp
-wget https://repo.radeon.com/amdgpu-install/7.1/ubuntu/noble/amdgpu-install_7.1.70100-1_all.deb
-sudo apt install ./amdgpu-install_7.1.70100-1_all.deb
-sudo amdgpu-install -y --usecase=graphics,rocm
-sudo usermod -a -G render,video $LOGNAME
-
-# (위에 이어서) amd gpu driver install
-sudo apt install "linux-headers-$(uname -r)" "linux-modules-extra-$(uname -r)"
-sudo apt install amdgpu-dkms
-
-# npm 설치
+# npm 설치 (oh my logo를 위한 선택사항)
 sudo apt install npm -y
 
 # docker
-# 기존 버전 삭제
+#기존 버전 삭제
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
 # apt repo 설정
-# Add Docker's official GPG key:
+#Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
@@ -145,7 +147,7 @@ minikube config set memory 28672
 minikube start --addons=metrics-server,metallb --cni=flannel
 minikube tunnel
 
-#기동후 amd gpu plugin 수동 설치
+# 기동후 amd gpu plugin 수동 설치
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
 
 # kubectx, kubens 설치
@@ -153,9 +155,6 @@ curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_k
 
 # freelens 설치
 sudo snap install freelens --classic
-
-# vscode 설치
-sudo snap install --classic code
 
 # termius-beta 설치
 sudo snap install termius-beta
@@ -177,7 +176,7 @@ https://kcloud.lgcns.com/vmCubeClients/Tilon/linux/Linker-Linux-v8.0.0.2.deb
 sudo apt update
 sudo apt install libqt5websockets5 libqt5websockets5-dev
 
-# 또는 더 포괄적으로 Qt5 관련 패키지 설치
+#또는 더 포괄적으로 Qt5 관련 패키지 설치
 sudo apt install qtbase5-dev qt5-qmake libqt5websockets5
 
 1. 다운로드 디렉토리에서 패키지 설치
@@ -202,10 +201,10 @@ sudo apt install qtbase5-dev qt5-qmake libqt5websockets5
         xdg-mime query default x-scheme-handler/dslinker9
         update-mime-database ~/.local/share/mime
 
-# MIME 타입 핸들러 확인
+#MIME 타입 핸들러 확인
 CURRENT_DEFAULT=$(xdg-mime query default x-scheme-handler/dslinker9)
 
-# 결과 출력
+#결과 출력
 echo "현재 x-scheme-handler/dslinker MIME 타입 핸들러: $CURRENT_DEFAULT"
 
 

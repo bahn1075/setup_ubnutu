@@ -33,11 +33,11 @@ style = 'bold bright-green'
 format = 'via $symbol[${ram}]($style) '
 
 # GPU 메모리 사용률을 표시하는 커스텀 모듈
-[custom.gpu]
-command = '''rocm-smi --showmeminfo vram --csv 2>/dev/null | tail -n +2 | awk -F, '{used += $3; total += $2} END {if(total > 0) printf "%.0f", (used/total)*100; else print "N/A"}' '''
-when = "command -v rocm-smi"
-format = '[🎮$output%]($style) '
-style = 'bold bright-red'
+# [custom.gpu]
+# command = '''rocm-smi --showmeminfo vram --csv 2>/dev/null | tail -n +2 | awk -F, '{used += $3; total += $2} END {if(total > 0) printf "%.0f", (used/total)*100; else print "N/A"}' '''
+# when = "command -v rocm-smi"
+# format = '[🎮$output%]($style) '
+# style = 'bold bright-red'
 
 [kubernetes]
 disabled = false
@@ -74,5 +74,5 @@ staged = '[++\($count\)](green)'
 renamed = '👅'
 deleted = '🗑'
 
-[os.symbols]
-OracleLinux = '⊂⊃'
+# [os.symbols]
+# OracleLinux = '⊂⊃'
