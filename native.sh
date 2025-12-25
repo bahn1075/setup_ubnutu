@@ -82,6 +82,11 @@ echo "alias ls='eza --icons --git --level=2'" >> /home/$USER/.zshrc
 
 source ~/.zshrc
 
+
+## superfile 설치. 실행은 spf. mdir과 유사한 형태
+bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
+
+
 #amd gpu rocm installation
 sudo apt update
 cd /tmp
