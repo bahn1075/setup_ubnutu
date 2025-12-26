@@ -1,4 +1,4 @@
-# native.sh
+# notebook.md
 # sudo 패스워드 묻지 않음
 ```
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER > /dev/null && sudo chmod 440 /etc/sudoers.d/$USER && sudo visudo -c -f /etc/sudoers.d/$USER
@@ -172,12 +172,59 @@ curl -fsSL https://claude.ai/install.sh | bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
+# oci cli 설치
+```
+# pipx 설치 (격리된 환경에서 CLI 도구 관리)
+sudo apt install pipx
+pipx ensurepath
+
+# OCI CLI 설치
+pipx install oci-cli
+
+# 설치 확인
+oci --version
+```
+이후
+```
+oci setup config
+```
+수행 후 public key 까지 생성했다면
+그 public key를 oci 콘솔에서
+사용자설정 -> 토큰 및 키 -> API 키 추가 -> 퍼블릭 키 붙여넣기 -> 로컬 public key의 내용을
+begin 부터 end까지 붙여넣는다
 
 # docker
 ```
 # 기존 버전 삭제
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 ```
+
+
+# docker 설치 확인 및 권한 설정 (snap 버전. ubuntu 26.10은 snap으로만 가능)
+```
+# snap docker의 경우 권한 설정이 필요함
+
+# 방법 1: socket 권한 변경 (간단하고 빠름)
+sudo chmod 666 /run/docker.sock
+docker ps
+
+# 방법 2: snap interface 연결
+sudo snap connect docker:privileged
+docker ps
+
+# 방법 3: 그룹 기반 권한 설정 (권장)
+sudo usermod -aG docker $USER
+# 새로운 터미널/SSH 세션에서 다시 로그인
+exit
+# 다시 로그인 후
+docker ps
+
+# 방법 4: 계속 sudo 사용 (임시방편)
+sudo docker ps
+```
+
+
+# 이하 ubntu 26.10 미만 버전에 해당됨 
 # apt repo 설정
 ```
 # Add Docker's official GPG key:
@@ -208,34 +255,16 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 ```
 
-# docker 설치 확인 및 권한 설정 (snap 버전. ubuntu 26.10은 snap으로만 가능)
-```
-# snap docker의 경우 권한 설정이 필요함
-
-# 방법 1: socket 권한 변경 (간단하고 빠름)
-sudo chmod 666 /run/docker.sock
-docker ps
-
-# 방법 2: snap interface 연결
-sudo snap connect docker:privileged
-docker ps
-
-# 방법 3: 그룹 기반 권한 설정 (권장)
-sudo usermod -aG docker $USER
-# 새로운 터미널/SSH 세션에서 다시 로그인
-exit
-# 다시 로그인 후
-docker ps
-
-# 방법 4: 계속 sudo 사용 (임시방편)
-sudo docker ps
-```
 
 # kubectl 설치
 ```
 cd /tmp
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+```
+# OKE cluster kubeconfig 등록
+```
+./app/setup_ubnutu/setup-oke-kubeconfig.sh
 ```
 
 # minikube install
@@ -249,12 +278,12 @@ minikube version
 
 # minikube start
 ```
-minikube config set cpus 8
-minikube config set memory 28672
+minikube config set cpus 4
+minikube config set memory 6144
 minikube start --addons=metrics-server,metallb --cni=flannel
 minikube tunnel
 ```
-# 기동후 amd gpu plugin 수동 설치
+# 기동후 amd gpu plugin 수동 설치 (노트북에 해당 사항 없음)
 ```
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
 ```
