@@ -1,0 +1,10 @@
+theme = Nord
+copy-on-select = clipboard
+right-click-action = paste
+
+# Focus Split Keybindings
+# close split = Ctrl + D
+keybind = ctrl+right=goto_split:right
+keybind = ctrl+left=goto_split:left
+keybind = ctrl+up=goto_split:up
+keybind = ctrl+down=goto_split:down
