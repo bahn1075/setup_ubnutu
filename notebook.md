@@ -1,38 +1,70 @@
 # native.sh
 # sudo 패스워드 묻지 않음
-echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER
-
+```
+echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER > /dev/null && sudo chmod 440 /etc/sudoers.d/$USER && sudo visudo -c -f /etc/sudoers.d/$USER
+```
+# sudo no passwd 확인 방법
+```
+sudo -l  # 현재 사용자의 sudo 권한 목록 확인
+sudo cat /etc/sudoers.d/$USER  # 파일 내용 확인
+ls -la /etc/sudoers.d/$USER  # 파일 권한 확인 (440이어야 함)
+sudo -n true && echo "패스워드 없이 sudo 가능" || echo "패스워드 필요"  # 실제 테스트
+```
 # 필수설치
 ```
 sudo apt update && sudo apt upgrade -y
 ```
 
 # install essentials
-sudo apt install zip gh timeshift wget btop zsh curl net-tools fonts-cascadia-code jq vim -y
+```
+sudo apt install zip gnome-tweaks gh timeshift wget btop zsh curl net-tools fonts-cascadia-code jq vim -y
+```
+# nord gnome shell theme 설치
+```
+# 테마 다운로드
+cd temp
+git clone https://github.com/EliverLara/Nordic.git
 
+# 테마 디렉토리로 복사
+mkdir -p ~/.themes
+cp -r Nordic ~/.themes/
+
+# 또는 시스템 전체에 설치
+sudo cp -r Nordic /usr/share/themes/
+```
+gnome shell extension (메뉴에서 '확장' 이라고 이름 붙여진)
+에서 user theme를 활성화 하고 터미널에서
+```
+gnome-tweaks
+```
+수행 후 appearence 에서 shell 부분에 nord 선택
 
 # lunarlake npu driver
 https://github.com/intel/linux-npu-driver/releases
 
 # github 로그인
+```
 gh auth login
 
 git config --global user.name "cozy"
 git config --global user.email bahn1075@gmail.com
-
+```
 # edge browser install
 https://www.microsoft.com/en-us/edge/business/download?form=MA13FJ
+
 여기서 다운로드 받고 다운로드 받은 파일에 우클릭해서 app center(=snap)으로 설치한다.
 
 # ghostty 설치
+```
 snap install ghostty --classic
-
+```
 
 ###################ghostty 설정#########################
-ghostty에서 config 설정을 열고 메모장으로 config 파일이 열리면 아래 내용을 붙여넣는다
 
+ghostty에서 config 설정을 열고 메모장으로 config 파일이 열리면 아래 내용을 붙여넣는다
+```
 # BEGIN el_init ghostty config
-# Nord Theme
+#Nord Theme
 theme = Nord
 
 # Clipboard
@@ -40,124 +72,184 @@ theme = Nord
 copy-on-select = clipboard
 right-click-action = paste
 # END el_init ghostty config
+```
 ###################ghostty 설정#########################
 
 # vs code 설치 
+```
 sudo snap install code --classic
-
-# 
+```
 
 # Meslo nerd font
+```
 curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Meslo.zip -o /tmp/meslo.zip && unzip /tmp/meslo.zip -d /tmp/meslo && sudo mkdir -p /usr/share/fonts/truetype/meslo-nerd && sudo cp /tmp/meslo/*.ttf /usr/share/fonts/truetype/meslo-nerd/ && sudo fc-cache -fv && rm -rf /tmp/meslo*
+```
 
 # ohmyzsh
+```
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
 # brew 설치
+```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 # brew 설정
+```
 echo >> /home/$USER/.zshrc
 echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/$USER/.zshrc
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    
+```
+
 # zsh-syntax-highlighting 설치
+```
 cd /tmp
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+```
 
 # .zshrc에 플러그인 추가 (이미 있으면 중복 추가 방지)
-if ! grep -q "zsh-syntax-highlighting" ~/.zshrc; then
-  sed -i 's/^plugins=(\(.*\))/plugins=(\1 zsh-syntax-highlighting)/' ~/.zshrc
-  #만약 plugins= 라인이 없다면 추가
-  if ! grep -q "^plugins=" ~/.zshrc; then
-    echo "plugins=(git kubectl kube-ps1 zsh-syntax-highlighting zsh-autosuggestions)" >> ~/.zshrc
+```
+# plugins 라인이 없으면 추가
+if ! grep -q "^plugins=" ~/.zshrc; then
+  echo "plugins=(git zsh-syntax-highlighting zsh-autosuggestions)" >> ~/.zshrc
+else
+  # plugins 라인이 있으면 플러그인 추가 (중복 방지)
+  if ! grep -q "zsh-syntax-highlighting" ~/.zshrc; then
+    sed -i 's/^plugins=(\(.*\))/plugins=(\1 zsh-syntax-highlighting)/' ~/.zshrc
   fi
-  #플러그인 활성화 코드가 없으면 추가
-  echo "source \${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
+  if ! grep -q "zsh-autosuggestions" ~/.zshrc; then
+    sed -i 's/^plugins=(\(.*\))/plugins=(\1 zsh-autosuggestions)/' ~/.zshrc
+  fi
 fi
 source ~/.zshrc
+```
 
 # brew 설치 대상
+```
 brew install starship fastfetch k9s eza
+```
 
 # superfile 설치 (실행 spf)
+```
 bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
-
+```
 
 # starship 설정 추가
+```
 curl -o ~/.config/starship.toml https://raw.githubusercontent.com/bahn1075/el_init/ubuntu/starship.toml
 
 echo 'eval "$(starship init zsh)"' >> /home/$USER/.zshrc
-
+```
 # fastfetch 설정 추가
+```
 echo 'fastfetch' >> /home/$USER/.zshrc
-
 source ~/.zshrc
+```
 
-# npm 설치 (oh my logo를 위한 선택사항)
+# virtual box 설치
+```
+sudo apt install virtualbox
+```
+
+# npm 설치 (oh my logo)
+```
 sudo apt install npm -y
+echo 'npx oh-my-logo "thinkpad!!" sunset --filled' >> ~/.zshrc
+source ~/.zshrc
+```
+# claude-code native 설치
+```
+curl -fsSL https://claude.ai/install.sh | bash
+
+# PATH 설정 추가
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
 
 # docker
-#기존 버전 삭제
+```
+# 기존 버전 삭제
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-
+```
 # apt repo 설정
-#Add Docker's official GPG key:
+```
+# Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
 
 # Add the repository to Apt sources:
+```
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
-
+```
 # docker 설치
+```
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+```
 
 # 설치 확인
+```
 sudo systemctl status docker
+```
 
-# post 작업
+# docker install post 작업
+```
 sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
 
 # docker 확인
 docker ps
+```
 
 # kubectl 설치
+```
 cd /tmp
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+```
 
 # minikube install
+```
 cd /tmp
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 sudo dpkg -i minikube_latest_amd64.deb
 #minikube 확인
 minikube version
+```
 
 # minikube start
+```
 minikube config set cpus 8
 minikube config set memory 28672
 minikube start --addons=metrics-server,metallb --cni=flannel
 minikube tunnel
-
+```
 # 기동후 amd gpu plugin 수동 설치
+```
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
+```
 
 # kubectx, kubens 설치
+```
 curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_kubens.sh | bash
+```
 
 # freelens 설치
+```
 sudo snap install freelens --classic
-
+```
 # termius-beta 설치
+```
 sudo snap install termius-beta
+```
 
 #######################################################################################################
 - Linux Client 링크
