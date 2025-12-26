@@ -138,13 +138,20 @@ bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
 ```
 curl -o ~/.config/starship.toml https://raw.githubusercontent.com/bahn1075/el_init/ubuntu/starship.toml
 
-echo 'eval "$(starship init zsh)"' >> /home/$USER/.zshrc
+echo 'eval "$(starship init zsh)"' >> /home/$USER/.zshrc걸
 ```
 # fastfetch 설정 추가
 ```
 echo 'fastfetch' >> /home/$USER/.zshrc
 source ~/.zshrc
 ```
+# eza 설정 추가
+```
+echo "alias ls=\"eza --icons --git --level=2 --time-style='+%m/%d %H:%M' --git-repos --total-size\"" >> ~/.zshrc
+source ~/.zshrc
+```
+
+
 
 # virtual box 설치
 ```
@@ -183,10 +190,17 @@ sudo chmod a+r /etc/apt/keyrings/docker.asc
 
 # Add the repository to Apt sources:
 ```
+# Ubuntu 26.10의 경우 fallback 처리
+UBUNTU_CODENAME=$(. /etc/os-release && echo "${VERSION_CODENAME:-noble}")
+
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  $UBUNTU_CODENAME stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 또는 더 안정적으로 jammy(22.04 LTS) 사용
+sudo sed -i 's/26.10\|oracular/jammy/g' /etc/apt/sources.list.d/docker.list
+
 sudo apt-get update
 ```
 # docker 설치
@@ -194,19 +208,27 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 ```
 
-# 설치 확인
+# docker 설치 확인 및 권한 설정 (snap 버전. ubuntu 26.10은 snap으로만 가능)
 ```
-sudo systemctl status docker
-```
+# snap docker의 경우 권한 설정이 필요함
 
-# docker install post 작업
-```
-sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-
-# docker 확인
+# 방법 1: socket 권한 변경 (간단하고 빠름)
+sudo chmod 666 /run/docker.sock
 docker ps
+
+# 방법 2: snap interface 연결
+sudo snap connect docker:privileged
+docker ps
+
+# 방법 3: 그룹 기반 권한 설정 (권장)
+sudo usermod -aG docker $USER
+# 새로운 터미널/SSH 세션에서 다시 로그인
+exit
+# 다시 로그인 후
+docker ps
+
+# 방법 4: 계속 sudo 사용 (임시방편)
+sudo docker ps
 ```
 
 # kubectl 설치
