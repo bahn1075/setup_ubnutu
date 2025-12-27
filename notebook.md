@@ -279,7 +279,7 @@ sudo snap install freelens --classic
 cp ~/.kube/config ~/.kube/config.backup
 
 # sed로 변경
-sed -i 's|command: oci$|command: /home/cozy/.local/bin/oci|g' ~/.kube/config
+sed -i 's|command: oci$|command: /home/$USER/.local/bin/oci|g' ~/.kube/config
 
 # 변경 확인
 grep "command:.*oci" ~/.kube/config
