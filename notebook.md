@@ -3,14 +3,14 @@
 ```
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$USER > /dev/null && sudo chmod 440 /etc/sudoers.d/$USER && sudo visudo -c -f /etc/sudoers.d/$USER
 ```
-# sudo no passwd 확인 방법
+## sudo no passwd 확인 방법
 ```
 sudo -l  # 현재 사용자의 sudo 권한 목록 확인
 sudo cat /etc/sudoers.d/$USER  # 파일 내용 확인
 ls -la /etc/sudoers.d/$USER  # 파일 권한 확인 (440이어야 함)
 sudo -n true && echo "패스워드 없이 sudo 가능" || echo "패스워드 필요"  # 실제 테스트
 ```
-# 필수설치
+# 필수설치 전 update
 ```
 sudo apt update && sudo apt upgrade -y
 ```
@@ -39,7 +39,7 @@ gnome-tweaks
 ```
 수행 후 appearence 에서 shell 부분에 nord 선택
 
-# lunarlake npu driver
+# lunarlake npu driver (26.10에서는 불가)
 https://github.com/intel/linux-npu-driver/releases
 
 # github 로그인
@@ -59,7 +59,6 @@ https://www.microsoft.com/en-us/edge/business/download?form=MA13FJ
 snap install ghostty --classic
 ```
 
-###################ghostty 설정#########################
 
 ghostty에서 config 설정을 열고 메모장으로 config 파일이 열리면 아래 내용을 붙여넣는다
 ```
@@ -73,7 +72,6 @@ copy-on-select = clipboard
 right-click-action = paste
 # END el_init ghostty config
 ```
-###################ghostty 설정#########################
 
 # vs code 설치 
 ```
@@ -89,17 +87,6 @@ curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Meslo.z
 ```
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
-# brew 설치
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-# brew 설정
-```
-echo >> /home/$USER/.zshrc
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/$USER/.zshrc
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-```
-
 # zsh-syntax-highlighting 설치
 ```
 cd /tmp
@@ -123,8 +110,18 @@ else
 fi
 source ~/.zshrc
 ```
+# brew 설치
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+# brew path 설정
+```
+echo >> /home/$USER/.zshrc
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/$USER/.zshrc
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
 
-# brew 설치 대상
+# brew 설치 대상 소프트웨어
 ```
 brew install starship fastfetch k9s eza
 ```
@@ -138,7 +135,7 @@ bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
 ```
 curl -o ~/.config/starship.toml https://raw.githubusercontent.com/bahn1075/el_init/ubuntu/starship.toml
 
-echo 'eval "$(starship init zsh)"' >> /home/$USER/.zshrc걸
+echo 'eval "$(starship init zsh)"' >> /home/$USER/.zshrc
 ```
 # fastfetch 설정 추가
 ```
@@ -172,7 +169,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
-# oci cli 설치
+# oci cli 설치(26.10에서는 pipx로만 가능)
 ```
 # pipx 설치 (격리된 환경에서 CLI 도구 관리)
 sudo apt install pipx
@@ -189,8 +186,10 @@ oci --version
 oci setup config
 ```
 수행 후 public key 까지 생성했다면
-그 public key를 oci 콘솔에서
+
+public key를 oci 콘솔에서
 사용자설정 -> 토큰 및 키 -> API 키 추가 -> 퍼블릭 키 붙여넣기 -> 로컬 public key의 내용을
+
 begin 부터 end까지 붙여넣는다
 
 # docker
@@ -266,8 +265,32 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
 ./app/setup_ubnutu/setup-oke-kubeconfig.sh
 ```
+# kubectx, kubens 설치
+```
+curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_kubens.sh | bash
+```
+# freelens 설치
+```
+sudo snap install freelens --classic
+```
+설치 후 oke 클러스터 연결시 freelens 수행 전 아래 수행
+```
+# 백업 생성
+cp ~/.kube/config ~/.kube/config.backup
 
-# minikube install
+# sed로 변경
+sed -i 's|command: oci$|command: /home/cozy/.local/bin/oci|g' ~/.kube/config
+
+# 변경 확인
+grep "command:.*oci" ~/.kube/config
+```
+
+# termius-beta 설치
+```
+sudo snap install termius-beta
+```
+
+# minikube install (필요시에만 설치)
 ```
 cd /tmp
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
@@ -286,16 +309,6 @@ minikube tunnel
 # 기동후 amd gpu plugin 수동 설치 (노트북에 해당 사항 없음)
 ```
 kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
-```
-
-# kubectx, kubens 설치
-```
-curl -fsSL https://raw.githubusercontent.com/bahn1075/el_init/oel10/72.kubectx_kubens.sh | bash
-```
-
-# freelens 설치
-```
-sudo snap install freelens --classic
 ```
 # termius-beta 설치
 ```
