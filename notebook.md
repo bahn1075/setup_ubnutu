@@ -306,9 +306,19 @@ minikube config set memory 6144
 minikube start --addons=metrics-server,metallb --cni=flannel
 minikube tunnel
 ```
-# 기동후 amd gpu plugin 수동 설치 (노트북에 해당 사항 없음)
+# 기동후 Intel GPU plugin 수동 설치
 ```
-kubectl create -f https://raw.githubusercontent.com/ROCm/k8s-device-plugin/master/k8s-ds-amdgpu-dp.yaml
+# 1. NFD (Node Feature Discovery) 배포
+kubectl apply -k 'https://github.com/intel/intel-device-plugins-for-kubernetes/deployments/nfd?ref=main'
+
+# 2. NodeFeatureRules 생성 (GPU 감지용)
+kubectl apply -k 'https://github.com/intel/intel-device-plugins-for-kubernetes/deployments/nfd/overlays/node-feature-rules?ref=main'
+
+# 3. GPU plugin daemonset 배포
+kubectl apply -k 'https://github.com/intel/intel-device-plugins-for-kubernetes/deployments/gpu_plugin/overlays/nfd_labeled_nodes?ref=main'
+
+# 4. 설치 확인
+kubectl get nodes -o=jsonpath="{range .items[*]}{.metadata.name}{'\n'}{' i915: '}{.status.allocatable.gpu\.intel\.com/i915}{'\n'}"
 ```
 # termius-beta 설치
 ```
