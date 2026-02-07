@@ -147,12 +147,27 @@ sudo dpkg -i minikube_latest_amd64.deb
 #minikube 확인
 minikube version
 
+# minikube upgrade
+echo ""
+echo "=========================================="
+echo "Minikube 업데이트 중..."
+echo "=========================================="
+cd /tmp
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+sudo dpkg -i minikube_latest_amd64.deb
+minikube version
+
 # minikube start
 minikube config set cpus 4
 minikube config set memory 8192
 minikube start --nodes 2 --cni=flannel
 minikube addons enable metrics-server
 minikube addons enable metallb
+--metallb 설정
+minikube addons configure metallb <<EOF
+192.168.49.100
+192.168.49.150
+EOF
 
 # minikube 자동화 서비스 설치 (tunnel + inotify)
 echo ""
