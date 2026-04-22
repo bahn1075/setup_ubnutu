@@ -209,8 +209,9 @@ sudo snap install termius-beta
 
 #######################################################################################################
 - Linux Client 링크
+- kcloud 홈페이지의 로그인 메인화면에서 다운로드를 눌러도 된다
 
-https://kcloud.lgcns.com/vmCubeClients/Tilon/linux/Linker-Linux-v8.0.0.2.deb
+https://kcloud.lgcns.com/vmCubeClients/Tilon/linux/Linker-Linux-v8.0.0.5.deb
 
 
 - 설치 가이드 (현재 설치 방법 간소화 작업 진행 중)
