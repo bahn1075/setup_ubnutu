@@ -17,7 +17,7 @@ sudo apt update && sudo apt upgrade -y
 
 # install essentials
 ```
-sudo apt install zip gnome-tweaks gh timeshift wget btop zsh curl net-tools fonts-cascadia-code jq vim -y
+sudo apt install zip gnome-tweaks gh timeshift wget btop zsh curl net-tools jq vim gnome-shell-extension-manager -y
 ```
 # nord gnome shell theme 설치
 ```
@@ -75,7 +75,21 @@ right-click-action = paste
 
 # vs code 설치 
 ```
-sudo snap install code --classic
+# 1. 잘못 추가된 repo 제거
+sudo rm /etc/apt/sources.list.d/archive_uri-https_packages_microsoft_com_repos_vscode-resolute.list
+
+# 2. GPG 키 제대로 등록
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc \
+  | gpg --dearmor \
+  | sudo tee /usr/share/keyrings/packages.microsoft.gpg > /dev/null
+
+# 3. signed-by 포함해서 repo 추가
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] \
+  https://packages.microsoft.com/repos/vscode stable main" \
+  | sudo tee /etc/apt/sources.list.d/vscode.list
+
+# 4. 설치
+sudo apt update && sudo apt install code
 ```
 
 # Meslo nerd font
@@ -161,22 +175,13 @@ sudo apt install npm -y
 echo 'npx oh-my-logo "thinkpad!!" sunset --filled' >> ~/.zshrc
 source ~/.zshrc
 ```
-# claude-code native 설치
+# claude-code brew 설치
 ```
-curl -fsSL https://claude.ai/install.sh | bash
-
-# PATH 설정 추가
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+brew install --cask claude-code
 ```
-# oci cli 설치(26.10에서는 pipx로만 가능)
+# oci cli 설치
 ```
-# pipx 설치 (격리된 환경에서 CLI 도구 관리)
-sudo apt install pipx
-pipx ensurepath
-
-# OCI CLI 설치
-pipx install oci-cli
+brew install oci-cli
 
 # 설치 확인
 oci --version
@@ -201,53 +206,8 @@ for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker c
 
 # docker 설치 확인 및 권한 설정 (snap 버전. ubuntu 26.10은 snap으로만 가능)
 ```
-# snap docker의 경우 권한 설정이 필요함
-
-# 방법 1: socket 권한 변경 (간단하고 빠름)
-sudo chmod 666 /run/docker.sock
-docker ps
-
-# 방법 2: snap interface 연결
-sudo snap connect docker:privileged
-docker ps
-
-# 방법 3: 그룹 기반 권한 설정 (권장)
-sudo usermod -aG docker $USER
-# 새로운 터미널/SSH 세션에서 다시 로그인
-exit
-# 다시 로그인 후
-docker ps
-
-# 방법 4: 계속 sudo 사용 (임시방편)
-sudo docker ps
-```
-
-
-# 이하 ubntu 26.10 미만 버전에 해당됨 
-# apt repo 설정
-```
-# Add Docker's official GPG key:
-sudo apt-get update
-sudo apt-get install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-```
-
-# Add the repository to Apt sources:
-```
-# Ubuntu 26.10의 경우 fallback 처리
-UBUNTU_CODENAME=$(. /etc/os-release && echo "${VERSION_CODENAME:-noble}")
-
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $UBUNTU_CODENAME stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-# 또는 더 안정적으로 jammy(22.04 LTS) 사용
-sudo sed -i 's/26.10\|oracular/jammy/g' /etc/apt/sources.list.d/docker.list
-
-sudo apt-get update
+아래 페이지의 가이드를 보고 따라하면 
+https://docs.docker.com/engine/install/ubuntu/
 ```
 # docker 설치
 ```
@@ -318,7 +278,7 @@ sudo snap install termius-beta
 #######################################################################################################
 - Linux Client 링크
 
-https://kcloud.lgcns.com/vmCubeClients/Tilon/linux/Linker-Linux-v8.0.0.2.deb
+https://kcloud.lgcns.com/vmCubeClients/Tilon/linux/Linker-Linux-v8.0.0.5.deb
 
 
 - 설치 가이드 (현재 설치 방법 간소화 작업 진행 중)
