@@ -1,6 +1,15 @@
 #!/bin/bash
 # setup-oke-kubeconfig-fixed.sh
 
+
+
+# 먼저 oci cli 로그인을 터미널에서 수행한다.
+# 간단하게 하는 방법은 터미널에서 브라우저 기반 로그인 수행을 위해
+# oci session authenticate 를 입력하고 Enter the name of the profile you would like to create: 가 나오면 'DEFAULT'를 입력
+# 이후 echo 'export OCI_CLI_AUTH=security_token' >> ~/.zshrc
+# source ~/.zshrc 를 수행한 다음 확인 으로 oci iam region list 수행
+
+
 set -e
 
 echo "=== OKE Cluster를 kubectl context로 등록 ==="
